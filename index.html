@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Meal Prep">
+<title>Meal Prep</title>
+<style>
+:root{--g:#1D9E75;--gl:#e6f9f2;--bg:#f2f2f7;--card:#fff;--bd:#e5e5ea;--tx:#1c1c1e;--sub:#6c6c70;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,sans-serif;background:var(--bg);color:var(--tx);}
+.header{background:var(--card);padding:52px 16px 12px;border-bottom:1px solid var(--bd);}
+.h1{font-size:22px;font-weight:700;}
+.hsub{font-size:13px;color:var(--sub);margin-top:3px;}
+.stats{display:flex;gap:7px;margin-top:10px;}
+.stat{flex:1;background:var(--bg);border-radius:10px;padding:7px 4px;text-align:center;}
+.sv{font-size:13px;font-weight:700;color:var(--g);}
+.sl{font-size:10px;color:var(--sub);margin-top:1px;}
+.bwrap{background:var(--card);padding:10px 16px 12px;border-bottom:1px solid var(--bd);}
+.brow{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px;}
+.blabel{color:var(--sub);}
+.bval{font-weight:700;color:#185FA5;transition:color .3s;}
+.bar{height:8px;background:var(--bd);border-radius:99px;overflow:hidden;}
+.barfill{height:100%;width:0%;border-radius:99px;background:#185FA5;transition:width .4s,background .3s;}
+.tabbar{display:flex;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:100;}
+.tabbar button{flex:1;padding:12px 0;font-size:14px;font-weight:600;color:var(--sub);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;}
+.tabbar button.on{color:var(--g);border-bottom-color:var(--g);}
+.page{display:none;padding:12px 14px 100px;}
+.page.on{display:block;}
+.stitle{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin:16px 2px 7px;}
+.grp{background:var(--card);border-radius:14px;overflow:hidden;margin-bottom:6px;}
+.row{border-bottom:0.5px solid var(--bd);}
+.row:last-child{border-bottom:none;}
+.row input[type=checkbox]{display:none;}
+.row label{display:flex;align-items:center;gap:11px;padding:12px 13px;cursor:pointer;-webkit-user-select:none;user-select:none;}
+.row input:checked+label{opacity:.38;}
+.row input:checked+label .rn{text-decoration:line-through;}
+.row input:checked+label .chk{background:var(--g);border-color:var(--g);}
+.row input:checked+label .chk::after{content:'✓';font-size:12px;color:#fff;font-weight:800;}
+.chk{width:23px;height:23px;border:2px solid #c7c7cc;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:#fff;}
+.ri{flex:1;min-width:0;}
+.rn{font-size:14px;font-weight:500;line-height:1.3;}
+.rd{font-size:12px;color:var(--sub);margin-top:1px;}
+.rr{text-align:right;flex-shrink:0;}
+.rp{font-size:13px;font-weight:700;color:#185FA5;}
+.rm{font-size:11px;color:#aeaeb2;}
+.nb{font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;background:#fff3cd;color:#7a5900;margin-left:4px;vertical-align:middle;}
+.clabel{font-size:11px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.05em;margin:16px 2px 8px;}
+.rc{background:var(--card);border-radius:14px;padding:13px 14px;margin-bottom:8px;}
+.rh{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:7px;}
+.rt{font-size:15px;font-weight:600;line-height:1.3;}
+.tbadge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--gl);color:#0F6E56;white-space:nowrap;flex-shrink:0;}
+.macs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;}
+.mc{font-size:11px;font-weight:500;padding:2px 9px;border-radius:99px;}
+.mk{background:#fff8e6;color:#7a5900;}
+.mp{background:#e6f1fb;color:#185FA5;}
+.tg{font-size:11px;padding:2px 9px;border-radius:99px;background:var(--bg);color:var(--sub);}
+/* RECIPE AVAILABILITY BADGE */
+.avail{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:8px;margin-bottom:8px;font-size:12px;font-weight:500;}
+.avail.yes{background:#e6f9f2;color:#0F6E56;}
+.avail.no{background:#fff3cd;color:#7a5900;}
+.avail.partial{background:#fff0e6;color:#c0392b;}
+.ibox{background:var(--bg);border-radius:10px;padding:9px 11px;margin-bottom:8px;}
+.ititle{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.ilist{list-style:none;padding:0;}
+.ilist li{font-size:13px;color:var(--tx);padding:2px 0;display:flex;gap:5px;align-items:flex-start;}
+.ilist li::before{content:'·';color:var(--g);font-weight:700;flex-shrink:0;}
+.ilist li.missing{color:#c0392b;}
+.ilist li.missing::before{content:'✗';color:#c0392b;}
+.ilist li.have{color:#0F6E56;}
+.ilist li.have::before{content:'✓';color:#0F6E56;}
+.stitle2{font-size:10px;font-weight:600;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin-bottom:5px;}
+.stps{padding-left:16px;}
+.stps li{font-size:13px;color:#3c3c43;line-height:1.6;margin-bottom:2px;}
+.tip{background:var(--gl);border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:13px;color:#0F6E56;border-left:2px solid var(--g);}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="h1">🥗 Meal Prep</div>
+  <div class="hsub">4000 kcal · 200g Protein · max. 20 min · max. 50 €/Woche</div>
+  <div class="stats">
+    <div class="stat"><div class="sv">4000</div><div class="sl">kcal/Tag</div></div>
+    <div class="stat"><div class="sv">200g</div><div class="sl">Protein</div></div>
+    <div class="stat"><div class="sv" id="sd">0</div><div class="sl">abgehakt</div></div>
+    <div class="stat"><div class="sv" id="sp" style="color:#185FA5;">0,00 €</div><div class="sl">von 50 €</div></div>
+  </div>
+</div>
+<div class="bwrap">
+  <div class="brow"><span class="blabel">💰 Budget</span><span class="bval" id="bv">0,00 € / 50,00 €</span></div>
+  <div class="bar"><div class="barfill" id="bf"></div></div>
+</div>
+<div class="tabbar">
+  <button class="on" id="tb1" onclick="showTab(1)">🛒 Einkauf</button>
+  <button id="tb2" onclick="showTab(2)">🍱 Rezepte</button>
+</div>
+
+<!-- EINKAUF -->
+<div class="page on" id="pg1">
+
+  <div class="stitle">Protein-Quellen</div>
+  <div class="grp">
+    <div class="row"><input type="checkbox" id="c0" onchange="upd()"><label for="c0"><div class="chk"></div><div class="ri"><div class="rn">Hähnchenbrust (1 kg)</div><div class="rd">Aldi / Lidl – Kühlregal</div></div><div class="rr"><div class="rp">5,99 €</div><div class="rm">~220g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c1" onchange="upd()"><label for="c1"><div class="chk"></div><div class="ri"><div class="rn">Rinder-Hackfleisch (500g × 2)</div><div class="rd">Gemischtes Hack auch ok</div></div><div class="rr"><div class="rp">5,00 €</div><div class="rm">~60g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c2" onchange="upd()"><label for="c2"><div class="chk"></div><div class="ri"><div class="rn">Thunfisch Dosen (× 6)</div><div class="rd">Aldi "Meeresperle" oder Lidl</div></div><div class="rr"><div class="rp">4,20 €</div><div class="rm">~120g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c3" onchange="upd()"><label for="c3"><div class="chk"></div><div class="ri"><div class="rn">Eier (10er Pack)</div><div class="rd">M-Größe</div></div><div class="rr"><div class="rp">1,99 €</div><div class="rm">~26g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c4" onchange="upd()"><label for="c4"><div class="chk"></div><div class="ri"><div class="rn">Magerquark (× 3 Becher)</div><div class="rd">Aldi "Milsani" / Lidl "Milbona"</div></div><div class="rr"><div class="rp">2,40 €</div><div class="rm">~120g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c5" onchange="upd()"><label for="c5"><div class="chk"></div><div class="ri"><div class="rn">Gouda am Stück (400g)</div><div class="rd">Günstiger als Scheiben</div></div><div class="rr"><div class="rp">2,79 €</div><div class="rm">~100g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c6" onchange="upd()"><label for="c6"><div class="chk"></div><div class="ri"><div class="rn">Kochschinken (200g)</div><div class="rd">Lidl / Aldi – Wraps & Pfanne</div></div><div class="rr"><div class="rp">1,49 €</div><div class="rm">~36g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c7" onchange="upd()"><label for="c7"><div class="chk"></div><div class="ri"><div class="rn">Hähnchenoberschenkel (1 kg)</div><div class="rd">Günstiger, mehr Kalorien</div></div><div class="rr"><div class="rp">3,99 €</div><div class="rm">~180g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c37" onchange="upd()"><label for="c37"><div class="chk"></div><div class="ri"><div class="rn">Lachs-Filets TK (500g)<span class="nb">NEU</span></div><div class="rd">Lidl TK-Regal</div></div><div class="rr"><div class="rp">4,99 €</div><div class="rm">~100g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c38" onchange="upd()"><label for="c38"><div class="chk"></div><div class="ri"><div class="rn">Salami / Chorizo (100g)<span class="nb">NEU</span></div><div class="rd">Aldi – Kalorien + Geschmack</div></div><div class="rr"><div class="rp">1,29 €</div><div class="rm">~20g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c39" onchange="upd()"><label for="c39"><div class="chk"></div><div class="ri"><div class="rn">Mozzarella (× 2)<span class="nb">NEU</span></div><div class="rd">Aldi – auf Toast oder Pasta</div></div><div class="rr"><div class="rp">1,98 €</div><div class="rm">~34g P</div></div></label></div>
+  </div>
+
+  <div class="stitle">Kohlenhydrate & Energie</div>
+  <div class="grp">
+    <div class="row"><input type="checkbox" id="c8" onchange="upd()"><label for="c8"><div class="chk"></div><div class="ri"><div class="rn">Pasta (3 × 500g)</div><div class="rd">Penne / Fusilli Eigenmarke</div></div><div class="rr"><div class="rp">1,50 €</div><div class="rm">~1050 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c9" onchange="upd()"><label for="c9"><div class="chk"></div><div class="ri"><div class="rn">Reis (1 kg)</div><div class="rd">Langkorn – auf Herd kochen</div></div><div class="rr"><div class="rp">1,19 €</div><div class="rm">~1300 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c10" onchange="upd()"><label for="c10"><div class="chk"></div><div class="ri"><div class="rn">Haferflocken (500g)</div><div class="rd">Aldi – kalt einweichen</div></div><div class="rr"><div class="rp">0,59 €</div><div class="rm">~750 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c11" onchange="upd()"><label for="c11"><div class="chk"></div><div class="ri"><div class="rn">Vollkorn-Toast (× 1)</div><div class="rd">Aldi / Lidl</div></div><div class="rr"><div class="rp">1,19 €</div><div class="rm">~350 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c12" onchange="upd()"><label for="c12"><div class="chk"></div><div class="ri"><div class="rn">Tortilla-Wraps (8 St.)</div><div class="rd">Aldi / Lidl</div></div><div class="rr"><div class="rp">1,29 €</div><div class="rm">~960 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c13" onchange="upd()"><label for="c13"><div class="chk"></div><div class="ri"><div class="rn">Bananen (1 kg)</div><div class="rd">Günstigste Kalorienbombe</div></div><div class="rr"><div class="rp">1,29 €</div><div class="rm">~350 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c14" onchange="upd()"><label for="c14"><div class="chk"></div><div class="ri"><div class="rn">Instantnudeln (× 4)</div><div class="rd">Aldi – für schnelle Pfannen</div></div><div class="rr"><div class="rp">1,20 €</div><div class="rm">~1000 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c15" onchange="upd()"><label for="c15"><div class="chk"></div><div class="ri"><div class="rn">Kartoffeln (1,5 kg)</div><div class="rd">Lidl – Pfannkartoffeln</div></div><div class="rr"><div class="rp">1,29 €</div><div class="rm">~1150 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c16" onchange="upd()"><label for="c16"><div class="chk"></div><div class="ri"><div class="rn">Baguette (× 2)</div><div class="rd">Aldi Backstube</div></div><div class="rr"><div class="rp">0,80 €</div><div class="rm">~700 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c40" onchange="upd()"><label for="c40"><div class="chk"></div><div class="ri"><div class="rn">Toastbrot weiß (× 1)<span class="nb">NEU</span></div><div class="rd">Aldi – mehr Kalorien als Vollkorn</div></div><div class="rr"><div class="rp">0,99 €</div><div class="rm">~1200 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c41" onchange="upd()"><label for="c41"><div class="chk"></div><div class="ri"><div class="rn">Müsli (500g)<span class="nb">NEU</span></div><div class="rd">Aldi – mit Milch oder Quark</div></div><div class="rr"><div class="rp">1,49 €</div><div class="rm">~1800 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c42" onchange="upd()"><label for="c42"><div class="chk"></div><div class="ri"><div class="rn">Gnocchi (500g)<span class="nb">NEU</span></div><div class="rd">Lidl – schneller als Kartoffeln</div></div><div class="rr"><div class="rp">1,09 €</div><div class="rm">~850 kcal</div></div></label></div>
+  </div>
+
+  <div class="stitle">Fette & Saucen</div>
+  <div class="grp">
+    <div class="row"><input type="checkbox" id="c17" onchange="upd()"><label for="c17"><div class="chk"></div><div class="ri"><div class="rn">Olivenöl (500 ml)</div><div class="rd">Aldi "Florentino"</div></div><div class="rr"><div class="rp">2,99 €</div><div class="rm">~4100 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c18" onchange="upd()"><label for="c18"><div class="chk"></div><div class="ri"><div class="rn">Erdnussbutter (500g)</div><div class="rd">Aldi / Lidl Eigenmarke</div></div><div class="rr"><div class="rp">2,49 €</div><div class="rm">~2850 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c19" onchange="upd()"><label for="c19"><div class="chk"></div><div class="ri"><div class="rn">Butter (250g)</div><div class="rd">Aldi / Lidl</div></div><div class="rr"><div class="rp">1,99 €</div><div class="rm">~1800 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c20" onchange="upd()"><label for="c20"><div class="chk"></div><div class="ri"><div class="rn">Mayo (kleines Glas)</div><div class="rd">Für Wraps & Pasta</div></div><div class="rr"><div class="rp">0,99 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c21" onchange="upd()"><label for="c21"><div class="chk"></div><div class="ri"><div class="rn">Tomaten-Passata (× 2)</div><div class="rd">Für Hack-Sauce</div></div><div class="rr"><div class="rp">1,00 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c22" onchange="upd()"><label for="c22"><div class="chk"></div><div class="ri"><div class="rn">Sojasauce</div><div class="rd">Aldi / Lidl</div></div><div class="rr"><div class="rp">0,99 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c23" onchange="upd()"><label for="c23"><div class="chk"></div><div class="ri"><div class="rn">Kokosmilch Dose</div><div class="rd">Lidl</div></div><div class="rr"><div class="rp">0,99 €</div><div class="rm">~400 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c43" onchange="upd()"><label for="c43"><div class="chk"></div><div class="ri"><div class="rn">Sahne (200ml)<span class="nb">NEU</span></div><div class="rd">Aldi – für Saucen</div></div><div class="rr"><div class="rp">0,79 €</div><div class="rm">~700 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c44" onchange="upd()"><label for="c44"><div class="chk"></div><div class="ri"><div class="rn">Pesto (Glas)<span class="nb">NEU</span></div><div class="rd">Aldi – schnelle Pasta-Sauce</div></div><div class="rr"><div class="rp">1,49 €</div><div class="rm">~500 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c45" onchange="upd()"><label for="c45"><div class="chk"></div><div class="ri"><div class="rn">Ketchup / BBQ-Sauce<span class="nb">NEU</span></div><div class="rd">Aldi</div></div><div class="rr"><div class="rp">0,99 €</div></div></label></div>
+  </div>
+
+  <div class="stitle">Gemüse & Schnell-Zutaten</div>
+  <div class="grp">
+    <div class="row"><input type="checkbox" id="c24" onchange="upd()"><label for="c24"><div class="chk"></div><div class="ri"><div class="rn">Tiefkühl-Gemüsemix (750g)</div><div class="rd">Lidl – direkt in die Pfanne</div></div><div class="rr"><div class="rp">1,49 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c25" onchange="upd()"><label for="c25"><div class="chk"></div><div class="ri"><div class="rn">Frischkäse (Packung)</div><div class="rd">Lidl – Wraps & Pasta-Sauce</div></div><div class="rr"><div class="rp">0,99 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c26" onchange="upd()"><label for="c26"><div class="chk"></div><div class="ri"><div class="rn">Curry-Pulver</div><div class="rd">Aldi</div></div><div class="rr"><div class="rp">0,79 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c27" onchange="upd()"><label for="c27"><div class="chk"></div><div class="ri"><div class="rn">Knoblauch (Knolle)</div><div class="rd">Aldi</div></div><div class="rr"><div class="rp">0,49 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c28" onchange="upd()"><label for="c28"><div class="chk"></div><div class="ri"><div class="rn">Zwiebeln (1 kg Netz)</div><div class="rd">Aldi</div></div><div class="rr"><div class="rp">0,99 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c29" onchange="upd()"><label for="c29"><div class="chk"></div><div class="ri"><div class="rn">Parmesan gerieben (100g)</div><div class="rd">Auf Pasta / Toast</div></div><div class="rr"><div class="rp">1,29 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c30" onchange="upd()"><label for="c30"><div class="chk"></div><div class="ri"><div class="rn">Kichererbsen Dose (× 2)</div><div class="rd">Lidl – direkt essbar</div></div><div class="rr"><div class="rp">1,38 €</div><div class="rm">~30g P/Dose</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c46" onchange="upd()"><label for="c46"><div class="chk"></div><div class="ri"><div class="rn">Paprika (3 St.)<span class="nb">NEU</span></div><div class="rd">Aldi – für Pfanne & Wraps</div></div><div class="rr"><div class="rp">1,29 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c47" onchange="upd()"><label for="c47"><div class="chk"></div><div class="ri"><div class="rn">Champignons (500g)<span class="nb">NEU</span></div><div class="rd">Aldi – für Pfannengerichte</div></div><div class="rr"><div class="rp">1,49 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c48" onchange="upd()"><label for="c48"><div class="chk"></div><div class="ri"><div class="rn">Dosentomaten (× 2)<span class="nb">NEU</span></div><div class="rd">Aldi – für Saucen & Suppen</div></div><div class="rr"><div class="rp">0,98 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c49" onchange="upd()"><label for="c49"><div class="chk"></div><div class="ri"><div class="rn">Mais Dose<span class="nb">NEU</span></div><div class="rd">Aldi – für Wraps & Salat</div></div><div class="rr"><div class="rp">0,59 €</div></div></label></div>
+  </div>
+
+  <div class="stitle">Snacks & Getränke</div>
+  <div class="grp">
+    <div class="row"><input type="checkbox" id="c31" onchange="upd()"><label for="c31"><div class="chk"></div><div class="ri"><div class="rn">Vollmilch (1 L)</div><div class="rd">Täglich, günstig</div></div><div class="rr"><div class="rp">1,09 €</div><div class="rm">~300 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c32" onchange="upd()"><label for="c32"><div class="chk"></div><div class="ri"><div class="rn">Magerquark extra (× 2)</div><div class="rd">Abend-Snack mit Honig</div></div><div class="rr"><div class="rp">1,60 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c33" onchange="upd()"><label for="c33"><div class="chk"></div><div class="ri"><div class="rn">Studentenfutter (200g)</div><div class="rd">Nüsse + Rosinen</div></div><div class="rr"><div class="rp">1,49 €</div><div class="rm">~1000 kcal</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c34" onchange="upd()"><label for="c34"><div class="chk"></div><div class="ri"><div class="rn">Honig (Glas)</div><div class="rd">Für Quark & Oats</div></div><div class="rr"><div class="rp">1,99 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c35" onchange="upd()"><label for="c35"><div class="chk"></div><div class="ri"><div class="rn">Käsesticks (× 2 Packungen)</div><div class="rd">Lidl Snack-Pack</div></div><div class="rr"><div class="rp">1,98 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c36" onchange="upd()"><label for="c36"><div class="chk"></div><div class="ri"><div class="rn">Gewürze: Salz, Pfeffer, Paprika</div><div class="rd">Aldi Eigenmarke</div></div><div class="rr"><div class="rp">1,50 €</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c50" onchange="upd()"><label for="c50"><div class="chk"></div><div class="ri"><div class="rn">Proteinriegel (6er Pack)<span class="nb">NEU</span></div><div class="rd">Lidl – für Schule</div></div><div class="rr"><div class="rp">3,99 €</div><div class="rm">~120g P</div></div></label></div>
+    <div class="row"><input type="checkbox" id="c51" onchange="upd()"><label for="c51"><div class="chk"></div><div class="ri"><div class="rn">Trinkjoghurt (4er Pack)<span class="nb">NEU</span></div><div class="rd">Aldi – schnelle Kalorien</div></div><div class="rr"><div class="rp">1,49 €</div><div class="rm">~400 kcal</div></div></label></div>
+  </div>
+
+</div>
+
+<!-- REZEPTE -->
+<div class="page" id="pg2">
+  <div class="tip"><b>💡 Tipp:</b> Sonntag 2 Std. kochen → 5 Boxen für die Woche. Grüner Haken = alle Zutaten im Warenkorb!</div>
+
+  <div class="clabel">🏫 Schule – kalt, kein Aufwärmen</div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Thunfisch-Wrap</div><div class="tbadge">5 min</div></div>
+    <div class="macs"><span class="mc mk">650 kcal</span><span class="mc mp">45g P</span><span class="tg">Kein Kochen</span></div>
+    <div class="avail" id="av0">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il0">
+      <li data-id="c12">2 Tortilla-Wraps</li>
+      <li data-id="c2">1 Dose Thunfisch (185g)</li>
+      <li data-id="c20">2 EL Mayo</li>
+      <li data-id="c5">2 Scheiben Gouda (~40g)</li>
+      <li data-id="c36">Salz, Pfeffer</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Tortilla flach hinlegen</li><li>Thunfisch verteilen, Mayo drüber</li><li>Käse drauf, fest einrollen</li><li>In Folie wickeln – fertig</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Baguette-Sandwich</div><div class="tbadge">5 min</div></div>
+    <div class="macs"><span class="mc mk">800 kcal</span><span class="mc mp">45g P</span><span class="tg">Kein Kochen</span></div>
+    <div class="avail" id="av1">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il1">
+      <li data-id="c16">1 Baguette (halbiert)</li>
+      <li data-id="c6">100g Kochschinken</li>
+      <li data-id="c5">60g Gouda</li>
+      <li data-id="c25">2 EL Frischkäse</li>
+      <li data-id="c20">1 EL Mayo</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Baguette aufschneiden</li><li>Frischkäse auf beide Seiten</li><li>Kochschinken + Gouda drauf</li><li>Mayo, zusammenklappen, einwickeln</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Kochschinken-Käse-Toast</div><div class="tbadge">6 min</div></div>
+    <div class="macs"><span class="mc mk">700 kcal</span><span class="mc mp">45g P</span><span class="tg">Kein Kochen</span></div>
+    <div class="avail" id="av2">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il2">
+      <li data-id="c11">3 Scheiben Vollkorn-Toast</li>
+      <li data-id="c6">80g Kochschinken</li>
+      <li data-id="c5">60g Gouda</li>
+      <li data-id="c20">1 EL Mayo</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Toast toasten (2–3 min)</li><li>Kochschinken + Gouda drauf</li><li>Nochmal 1 min toasten</li><li>Mayo drauf, abkühlen, einpacken</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Hack-Box mit Reis</div><div class="tbadge">12 min</div></div>
+    <div class="macs"><span class="mc mk">900 kcal</span><span class="mc mp">55g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av3">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il3">
+      <li data-id="c1">200g Rinderhack</li>
+      <li data-id="c9">150g Reis roh</li>
+      <li data-id="c21">100ml Tomaten-Passata</li>
+      <li data-id="c17">1 TL Olivenöl</li>
+      <li data-id="c36">Salz, Pfeffer, Paprika</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Olivenöl in Pfanne, Hack braten (5 min)</li><li>Gewürze + Passata rein (3 min)</li><li>Reis separat kochen (Vortag!)</li><li>In Tupperbox – kalt auch lecker</li></ol>
+  </div>
+
+  <div class="clabel">🏠 Zuhause – schnell gekocht</div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Overnight Oats</div><div class="tbadge">5 min</div></div>
+    <div class="macs"><span class="mc mk">750 kcal</span><span class="mc mp">35g P</span><span class="tg">Kein Kochen</span></div>
+    <div class="avail" id="av4">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il4">
+      <li data-id="c10">100g Haferflocken</li>
+      <li data-id="c31">250ml Vollmilch</li>
+      <li data-id="c4">200g Magerquark</li>
+      <li data-id="c18">2 EL Erdnussbutter</li>
+      <li data-id="c34">1 EL Honig</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung (abends!)</div><ol class="stps"><li>Haferflocken + Milch in Glas</li><li>Quark unterrühren</li><li>Über Nacht in Kühlschrank</li><li>Morgens Erdnussbutter + Honig drüber</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Scrambled Eggs Mega</div><div class="tbadge">8 min</div></div>
+    <div class="macs"><span class="mc mk">700 kcal</span><span class="mc mp">50g P</span></div>
+    <div class="avail" id="av5">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il5">
+      <li data-id="c3">5 Eier</li>
+      <li data-id="c19">20g Butter</li>
+      <li data-id="c5">60g Gouda gerieben</li>
+      <li data-id="c11">2 Scheiben Toast</li>
+      <li data-id="c36">Salz, Pfeffer</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Eier verquirlen, Butter in Pfanne</li><li>Eier rein, langsam rühren (4 min)</li><li>Käse drauf schmelzen lassen</li><li>Toast dazu</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Instantnudel-Pfanne</div><div class="tbadge">10 min</div></div>
+    <div class="macs"><span class="mc mk">800 kcal</span><span class="mc mp">40g P</span><span class="tg">Schnell</span></div>
+    <div class="avail" id="av6">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il6">
+      <li data-id="c14">2 Packungen Instantnudeln</li>
+      <li data-id="c1">150g Hackfleisch</li>
+      <li data-id="c3">2 Eier</li>
+      <li data-id="c22">2 EL Sojasauce</li>
+      <li data-id="c17">1 TL Olivenöl</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Nudeln 3 min kochen, abgießen</li><li>Öl in Pfanne, Hack anbraten (4 min)</li><li>Nudeln + Sojasauce dazu</li><li>Eier reinschlagen, 2 min verrühren</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">5-Minuten-Curry</div><div class="tbadge">10 min</div></div>
+    <div class="macs"><span class="mc mk">850 kcal</span><span class="mc mp">35g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av7">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il7">
+      <li data-id="c24">300g TK-Gemüsemix</li>
+      <li data-id="c30">1 Dose Kichererbsen</li>
+      <li data-id="c23">200ml Kokosmilch</li>
+      <li data-id="c26">1 TL Curry-Pulver</li>
+      <li data-id="c9">150g Reis (vorab kochen)</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>TK-Gemüse direkt in Pfanne (4 min)</li><li>Kokosmilch + Curry + Kichererbsen rein</li><li>3 min köcheln lassen</li><li>Reis im Topf kurz erhitzen, dazu</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Pasta mit Frischkäse-Sauce</div><div class="tbadge">15 min</div></div>
+    <div class="macs"><span class="mc mk">1000 kcal</span><span class="mc mp">45g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av8">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il8">
+      <li data-id="c8">200g Pasta</li>
+      <li data-id="c6">100g Kochschinken</li>
+      <li data-id="c25">150g Frischkäse</li>
+      <li data-id="c29">30g Parmesan</li>
+      <li data-id="c27">1 Knoblauchzehe</li>
+      <li data-id="c19">etwas Butter</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Pasta kochen (10 min), Nudelwasser auffangen</li><li>Knoblauch in Butter 1 min anbraten</li><li>Frischkäse + Nudelwasser cremig rühren</li><li>Pasta + Schinken rein, Parmesan drüber</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Kartoffel-Pfanne mit Ei</div><div class="tbadge">18 min</div></div>
+    <div class="macs"><span class="mc mk">950 kcal</span><span class="mc mp">40g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av9">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il9">
+      <li data-id="c15">300g Kartoffeln</li>
+      <li data-id="c6">80g Kochschinken</li>
+      <li data-id="c3">2 Eier</li>
+      <li data-id="c17">2 EL Olivenöl</li>
+      <li data-id="c22">1 EL Sojasauce</li>
+      <li data-id="c36">Paprikapulver, Pfeffer</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Kartoffelscheiben in Öl braten (10 min)</li><li>Schinken dazu, 4 min mitbraten</li><li>Eier drüber, stocken lassen (2 min)</li><li>Sojasauce + Paprika drüber, fertig</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Spaghetti Aglio e Olio + Hähnchen</div><div class="tbadge">18 min</div></div>
+    <div class="macs"><span class="mc mk">1100 kcal</span><span class="mc mp">65g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av10">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il10">
+      <li data-id="c8">200g Spaghetti</li>
+      <li data-id="c0">200g Hähnchenbrust</li>
+      <li data-id="c17">3 EL Olivenöl</li>
+      <li data-id="c27">3 Knoblauchzehen</li>
+      <li data-id="c29">30g Parmesan</li>
+      <li data-id="c36">Salz, Pfeffer</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Pasta kochen (10 min)</li><li>Hähnchen in Streifen, in Öl braten (6 min)</li><li>Knoblauch ins Öl, 1 min anschwitzen</li><li>Pasta + Nudelwasser mischen, Parmesan drüber</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Lachs-Pfanne mit Reis</div><div class="tbadge">14 min</div></div>
+    <div class="macs"><span class="mc mk">950 kcal</span><span class="mc mp">60g P</span><span class="tg">Meal-Prep</span></div>
+    <div class="avail" id="av11">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il11">
+      <li data-id="c37">200g Lachs-Filet (TK)</li>
+      <li data-id="c9">150g Reis</li>
+      <li data-id="c22">2 EL Sojasauce</li>
+      <li data-id="c17">1 EL Olivenöl</li>
+      <li data-id="c24">150g TK-Gemüse</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Lachs in Pfanne mit Öl, 4 min je Seite</li><li>TK-Gemüse kurz mitbraten (3 min)</li><li>Sojasauce drüber</li><li>Reis separat kochen, dazu servieren</li></ol>
+  </div>
+
+  <div class="rc">
+    <div class="rh"><div class="rt">Gnocchi-Pfanne mit Salami</div><div class="tbadge">12 min</div></div>
+    <div class="macs"><span class="mc mk">900 kcal</span><span class="mc mp">35g P</span><span class="tg">Schnell</span></div>
+    <div class="avail" id="av12">⏳ Zutaten prüfen...</div>
+    <div class="ibox"><div class="ititle">Zutaten (1 Portion)</div><ul class="ilist" id="il12">
+      <li data-id="c42">500g Gnocchi</li>
+      <li data-id="c38">80g Salami/Chorizo</li>
+      <li data-id="c48">1 Dose Tomaten</li>
+      <li data-id="c17">1 EL Olivenöl</li>
+      <li data-id="c36">Salz, Pfeffer, Paprika</li>
+    </ul></div>
+    <div class="stitle2">Zubereitung</div><ol class="stps"><li>Gnocchi in Öl anbraten bis goldbraun (5 min)</li><li>Salami dazu, 2 min mitbraten</li><li>Dosentomaten rein, 4 min köcheln</li><li>Parmesan drüber, fertig</li></ol>
+  </div>
+
+</div>
+
+<script>
+var prices={c0:5.99,c1:5.00,c2:4.20,c3:1.99,c4:2.40,c5:2.79,c6:1.49,c7:3.99,c8:1.50,c9:1.19,c10:0.59,c11:1.19,c12:1.29,c13:1.29,c14:1.20,c15:1.29,c16:0.80,c17:2.99,c18:2.49,c19:1.99,c20:0.99,c21:1.00,c22:0.99,c23:0.99,c24:1.49,c25:0.99,c26:0.79,c27:0.49,c28:0.99,c29:1.29,c30:1.38,c31:1.09,c32:1.60,c33:1.49,c34:1.99,c35:1.98,c36:1.50,c37:4.99,c38:1.29,c39:1.98,c40:0.99,c41:1.49,c42:1.09,c43:0.79,c44:1.49,c45:0.99,c46:1.29,c47:1.49,c48:0.98,c49:0.59,c50:3.99,c51:1.49};
+
+function upd(){
+  var done=0,sum=0;
+  for(var id in prices){
+    var el=document.getElementById(id);
+    if(el&&el.checked){done++;sum+=prices[id];}
+  }
+  var pct=Math.min(sum/50*100,100);
+  var col=sum>50?'#e74c3c':sum>41?'#e67e22':'#185FA5';
+  document.getElementById('bf').style.width=pct.toFixed(1)+'%';
+  document.getElementById('bf').style.background=col;
+  var f=sum.toFixed(2).replace('.',',');
+  document.getElementById('bv').textContent=f+' \u20AC / 50,00 \u20AC';
+  document.getElementById('bv').style.color=col;
+  document.getElementById('sp').textContent=f+' \u20AC';
+  document.getElementById('sp').style.color=col;
+  document.getElementById('sd').textContent=done;
+  checkRecipes();
+}
+
+function checkRecipes(){
+  var NUM=13;
+  for(var i=0;i<NUM;i++){
+    var il=document.getElementById('il'+i);
+    var av=document.getElementById('av'+i);
+    if(!il||!av)continue;
+    var items=il.querySelectorAll('li[data-id]');
+    var total=items.length,have=0;
+    items.forEach(function(li){
+      var id=li.getAttribute('data-id');
+      var el=document.getElementById(id);
+      var checked=el&&el.checked;
+      li.className=checked?'have':'missing';
+      if(checked)have++;
+    });
+    if(have===total){
+      av.className='avail yes';
+      av.textContent='✅ Alle Zutaten im Warenkorb!';
+    } else if(have===0){
+      av.className='avail partial';
+      av.textContent='❌ Keine Zutaten abgehakt ('+total+' fehlen)';
+    } else {
+      av.className='avail no';
+      av.textContent='⚠️ '+(total-have)+' von '+total+' Zutaten fehlen noch';
+    }
+  }
+}
+
+function showTab(n){
+  document.getElementById('pg1').className='page'+(n===1?' on':'');
+  document.getElementById('pg2').className='page'+(n===2?' on':'');
+  document.getElementById('tb1').className=(n===1?'on':'');
+  document.getElementById('tb2').className=(n===2?'on':'');
+  window.scrollTo(0,0);
+}
+
+window.addEventListener('load',function(){
+  for(var id in prices){
+    (function(cid){
+      var el=document.getElementById(cid);
+      if(el)el.addEventListener('change',upd);
+    })(id);
+  }
+  checkRecipes();
+});
+</script>
+</body>
+</html>
